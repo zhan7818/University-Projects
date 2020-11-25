@@ -8,4 +8,4 @@ log('SCRIPT: Examples of using our libraries')
 const icyGen = new IcyGenerator("slide");
 icyGen.makeIcy("circle");
 icyGen.makeIcy();
-icyGen.makeIcy();
+icyGen.setSlide(true);
