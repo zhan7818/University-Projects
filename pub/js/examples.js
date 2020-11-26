@@ -34,8 +34,8 @@ function deployInvasiveAds(e) {
         const tri = icyGen.makeIcy("triangle", ["800","50","50","50"])
         const rect = icyGen.makeIcy("rectangle", ["400","485","300","300"]);
 
-        circ.style.backgroundImage="url(./hardcoded/ad_one.jpg)"
-        rect.style.backgroundImage="url(./hardcoded/ad_two.jpg)"
+        circ.style.backgroundImage="url(./js/hardcoded/ad_one.jpg)"
+        rect.style.backgroundImage="url(./js/hardcoded/ad_two.jpg)"
 
         icyGen.setRandomMovement(true) // RandomMovement is automatically disabled if you click on the icy element
         
