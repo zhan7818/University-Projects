@@ -1,14 +1,22 @@
 {
   "name": "icy_examples",
   "version": "1.0.0",
-  "description": "",
+  "description": "examples for js library",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "author": "zhan7818",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/csc309-fall-2020/js-library-zhan6546.git"
+  },
+  "author": "Tianyi Zhang",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/csc309-fall-2020/js-library-zhan6546/issues"
+  },
+  "homepage": "https://github.com/csc309-fall-2020/js-library-zhan6546#readme",
   "dependencies": {
     "express": "^4.17.1"
   }
