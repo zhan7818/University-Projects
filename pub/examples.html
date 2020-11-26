@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>JS Libraries Demo</title>
+
+    <!-- First we load jquery from a Google CDN. -->
+    <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Then we load a script that depends on jQuery -->
+    <script defer type="text/javascript" src='icy.js'></script>
+    <!-- Then we load a script that depends on our libraries (and jQuery) -->
+    <script defer type="text/javascript" src='examples.js'></script>
+
+ </head>
+ <body>
+
+   <h1>JS Libraries "Icy" Demo</h1>
+   <div id=InvasiveAds>
+      <p>
+         Suppose you are reading some article on a sketchy website...
+         <button class='deploy'>Deploy Egregiously Invasive Ads!</button>
+      </p>
+      <p>
+         <button class='clear'>Clear Ads</button>
+      </p>
+      <p>
+         <button class='switch'>Pause/Resume Random Movement</button>
+      </p>
+      <p>
+         <button class='collisionSwitch'>Switch Collision on drag and slide, ON or OFF</button>
+      </p><p>
+         <button class='slideSwitch'>Switch sliding after dragging, ON or OFF</button>
+      </p>
+   </div>
+
+   <h3>
+      To get rid of these ads, simply drag them out of the bounds of the window, or click the Clear Ads buttons
+   </h3>
+   
+ </body>
+
+</html>
