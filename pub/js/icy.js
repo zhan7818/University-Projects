@@ -8,7 +8,6 @@ console.log("SCRIPT: Loaded Icy JS");
 // Create an object constructor and add to its prototype
 
 (function (global, document, $) {
-
   function IcyGenerator(slide, collide) {
     // Here should contain all the variables that each Icy elements should have a unique instance of
     // Icy elements from the same instance could be stored in an array to allow elements from that array to collide with each other
@@ -22,13 +21,31 @@ console.log("SCRIPT: Loaded Icy JS");
   }
 
   /*=======Private properties and functions==========*/
-	// unless we attach these to the global window object, they cannot be accessed directly.
-	// they will only be in the closure of this function, and can be accessed only the places we use them (such as in the functions of the IcyGenerator prototype)
-  let _iW, _iH, _iX, _iY, _tW, _tH, _tX, _tY, _icX, _icY, _tcX, _tcY, _iRad, _tRad; // Attributes for icy movement on window
-  let _TotalNumOfIcies = 0 // Number of Total Icy elements currently present in the window
-  
+  // unless we attach these to the global window object, they cannot be accessed directly.
+  // they will only be in the closure of this function, and can be accessed only the places we use them (such as in the functions of the IcyGenerator prototype)
+  let _iW,
+    _iH,
+    _iX,
+    _iY,
+    _tW,
+    _tH,
+    _tX,
+    _tY,
+    _icX,
+    _icY,
+    _tcX,
+    _tcY,
+    _iRad,
+    _tRad,
+    _collided; // Attributes for icy movement on window
+  let _TotalNumOfIcies = 0; // Number of Total Icy elements currently present in the window
+
   function _changeNumOfIcies(change) {
     _TotalNumOfIcies = _TotalNumOfIcies + change;
+  }
+
+  function _setCollided(collision) {
+    _collided = collision;
   }
   /*=======End of private properties/functions=======*/
 
@@ -63,8 +80,9 @@ console.log("SCRIPT: Loaded Icy JS");
         icy.style.borderBottom = `${
           startPos ? parseInt(startPos[2]) + parseInt(startPos[3]) : 50
         }px solid gray`;
-      } else {  // Default
-        icy.style.backgroundColor= "Gray";
+      } else {
+        // Default
+        icy.style.backgroundColor = "Gray";
       }
 
       // Mouse functions
@@ -86,6 +104,8 @@ console.log("SCRIPT: Loaded Icy JS");
         // Collision Detection Function
         const collisionDetection = () => {
           for (let i = 0; i < this.icies.length; i++) {
+            _setCollided(false); // Reset _collided
+
             _iW = icy.offsetWidth;
             _iH = icy.offsetHeight;
             _iX = icy.offsetLeft;
@@ -95,33 +115,153 @@ console.log("SCRIPT: Loaded Icy JS");
             _tX = this.icies[i].offsetLeft;
             _tY = this.icies[i].offsetTop;
 
-            _icX = _iX + _iW / 2 // Center X of initial icy
-            _icY = _iY + _iH / 2 // Center Y of initial icy
-            _tcX = _tX + _tW / 2 // Center X of target icy
-            _tcY = _tY + _tH / 2 // Center Y of target icy
+            _icX = _iX + _iW / 2; // Center X of initial icy
+            _icY = _iY + _iH / 2; // Center Y of initial icy
+            _tcX = _tX + _tW / 2; // Center X of target icy
+            _tcY = _tY + _tH / 2; // Center Y of target icy
 
-            _iRad = Math.min((_iW / 2),(_iH / 2)) // Radius of initial icy based on min or height or width
-            _tRad = Math.min((_tW / 2),(_tH / 2)) // Radius of target icy based on min or height or width
+            _iRad = Math.min(_iW / 2, _iH / 2); // Radius of initial icy based on min or height or width
+            _tRad = Math.min(_tW / 2, _tH / 2); // Radius of target icy based on min or height or width
 
             //log(iW + ' ' + iH + ' ' + iX + ' ' + iY)
 
             // Rudimentary Detection Math
             // For circles: check if sum of their radii is less than or equal to the distance between the center of the two circles
             // For rectangle: simple check
-            if (this.shapes[i] == "circle" && this.shapes[this.icies.indexOf(icy)] == "circle") { // Circle vs Circle
+
+            // format: $initial$ vs $target$
+            // Circle vs Circle
+            if (
+              this.shapes[this.icies.indexOf(icy)] == "circle" &&
+              this.shapes[i] == "circle"
+            ) {
               if (
-                Math.sqrt(Math.pow(_tcX-_icX, 2) + Math.pow(_tcY-_icY, 2)) <= (_iRad + _tRad) &&
+                Math.sqrt(
+                  Math.pow(_tcX - _icX, 2) + Math.pow(_tcY - _icY, 2)
+                ) <=
+                  _iRad + _tRad &&
                 this.icies.indexOf(icy) != i
               ) {
                 log("Collision Detected. Circle vs Circle.");
-                this.icies[i].style.left = `${
-                  this.icies[i].offsetLeft - changeX
-                }px`;
-                this.icies[i].style.top = `${
-                  this.icies[i].offsetTop - changeY
-                }px`;
+                _setCollided(true);
               }
-            } else {  // Default: Rectangle vs Rectangle
+            }
+            // Rectangle vs Circle
+            else if (
+              this.shapes[this.icies.indexOf(icy)] == "rectangle" &&
+              this.shapes[i] == "circle"
+            ) {
+              // Vertical Collision with circle as rectangle
+              if (
+                _tcX > _iX &&
+                _tcX < _iX + _iW &&
+                Math.min(Math.abs(_tcY - _iY), Math.abs(_tcY - _iY - _iH)) <=
+                  _tRad &&
+                this.icies.indexOf(icy) != i
+              ) {
+                log(
+                  "Collision Detected. Rectangle vs Circle. Vertical Collision"
+                );
+                _setCollided(true);
+              }
+              // Horizontal Collision with circle as rectangle
+              else if (
+                _tcY > _iY &&
+                _tcY < _iY + _iH &&
+                Math.min(Math.abs(_tcX - _iX), Math.abs(_tcX - _iX - _iW)) <=
+                  _tRad &&
+                this.icies.indexOf(icy) != i
+              ) {
+                log(
+                  "Collision Detected. Rectangle vs Circle. Horizontal Collision"
+                );
+                _setCollided(true);
+              }
+              // Diagonal Collision with circle as rectangle
+              else if (
+                Math.sqrt(
+                  Math.pow(
+                    Math.min(
+                      Math.abs(_tcX - _iX),
+                      Math.abs(_tcX - (_iX + _iW))
+                    ),
+                    2
+                  ) +
+                    Math.pow(
+                      Math.min(
+                        Math.abs(_tcY - _iY),
+                        Math.abs(_tcY - (_iY + _iH))
+                      ),
+                      2
+                    )
+                ) <= _tRad &&
+                this.icies.indexOf(icy) != i
+              ) {
+                log(
+                  "Collision Detected. Rectangle vs Circle. Diagonal Collision"
+                );
+                _setCollided(true);
+              }
+            }
+            // Circle vs Rectangle
+            else if (
+              this.shapes[this.icies.indexOf(icy)] == "circle" &&
+              this.shapes[i] == "rectangle"
+            ) {
+              // Vertical Collision with rectangle as circle
+              if (
+                _icX > _tX &&
+                _icX < _tX + _tW &&
+                Math.min(Math.abs(_icY - _tY), Math.abs(_icY - _tY - _tH)) <=
+                  _iRad &&
+                this.icies.indexOf(icy) != i
+              ) {
+                log(
+                  "Collision Detected. Rectangle vs Circle. Vertical Collision"
+                );
+                _setCollided(true);
+              }
+              // Horizontal Collision with rectangle as circle
+              else if (
+                _icY > _tY &&
+                _icY < _tY + _tH &&
+                Math.min(Math.abs(_icX - _tX), Math.abs(_icX - _tX - _tW)) <=
+                  _iRad &&
+                this.icies.indexOf(icy) != i
+              ) {
+                log(
+                  "Collision Detected. Rectangle vs Circle. Horizontal Collision"
+                );
+                _setCollided(true);
+              }
+              // Diagonal Collision with rectangle as circle
+              else if (
+                Math.sqrt(
+                  Math.pow(
+                    Math.min(
+                      Math.abs(_icX - _tX),
+                      Math.abs(_icX - (_tX + _tW))
+                    ),
+                    2
+                  ) +
+                    Math.pow(
+                      Math.min(
+                        Math.abs(_icY - _tY),
+                        Math.abs(_icY - (_tY + _tH))
+                      ),
+                      2
+                    )
+                ) <= _iRad &&
+                this.icies.indexOf(icy) != i
+              ) {
+                log(
+                  "Collision Detected. Rectangle vs Circle. Diagonal Collision"
+                );
+                _setCollided(true);
+              }
+            }
+            // Default: Rectangle vs Rectangle
+            else {
               if (
                 _iX + _iW > _tX &&
                 _iX < _tX + _tW &&
@@ -130,13 +270,17 @@ console.log("SCRIPT: Loaded Icy JS");
                 this.icies.indexOf(icy) != i
               ) {
                 log("Collision Detected");
-                this.icies[i].style.left = `${
-                  this.icies[i].offsetLeft - changeX
-                }px`;
-                this.icies[i].style.top = `${
-                  this.icies[i].offsetTop - changeY
-                }px`;
+                _setCollided(true);
               }
+            }
+            // Finally, do the collision movement IF _collided is true
+            if (_collided) {
+              this.icies[i].style.left = `${
+                this.icies[i].offsetLeft - changeX
+              }px`;
+              this.icies[i].style.top = `${
+                this.icies[i].offsetTop - changeY
+              }px`;
             }
           }
 
@@ -199,12 +343,12 @@ console.log("SCRIPT: Loaded Icy JS");
           window.removeEventListener("mousemove", mousemove);
           window.removeEventListener("mouseup", mouseup);
 
-          // If the DOM element is not in the viewport, then remove it.
+          // If the DOM element is MOSTLY not in the viewport, then remove it.
           if (
-            bounds.left < 0 ||
-            bounds.top < 0 ||
-            bounds.left > window.innerWidth ||
-            bounds.top > window.innerHeight
+            bounds.left + bounds.width / 2 < 0 ||
+            bounds.top + bounds.height / 2 < 0 ||
+            bounds.left + bounds.width / 2 > window.innerWidth ||
+            bounds.top + bounds.height / 2 > window.innerHeight
           ) {
             log("removing icy element");
             this.icies.splice(this.icies.indexOf(icy), 1);
@@ -226,10 +370,12 @@ console.log("SCRIPT: Loaded Icy JS");
       this.icies.push(icy); // add to the icies list
 
       // add the shape to the shapes list
-      if (shape) {  // if shape parameter was given at the beginning
-       this.shapes.push(shape)
-      } else {  // Default Shape: rectangle
-        this.shapes.push('rectangle')
+      if (shape) {
+        // if shape parameter was given at the beginning
+        this.shapes.push(shape);
+      } else {
+        // Default Shape: rectangle
+        this.shapes.push("rectangle");
       }
       _changeNumOfIcies(1); // Increase NumOfIcies by 1
       return icy;
@@ -252,8 +398,7 @@ console.log("SCRIPT: Loaded Icy JS");
         this.shapes.splice(this.icies.indexOf(icy), 1);
         this.icies.splice(this.icies.indexOf(icy), 1);
         $(icy).remove();
-        _changeNumOfIcies(-1) // Decrease NumOfIcies by 1
-
+        _changeNumOfIcies(-1); // Decrease NumOfIcies by 1
       } else if (!icy) {
         log("removing all icy elements");
 
@@ -269,9 +414,9 @@ console.log("SCRIPT: Loaded Icy JS");
         if (this.randomTimerVel.length === this.icies.length) {
           this.randomTimerVel.splice(0, this.randomTimerVel.length);
         }
-        
+
         // Remove all the icies
-        _changeNumOfIcies(-1*this.icies.length);  // Decrease NumOfIcies
+        _changeNumOfIcies(-1 * this.icies.length); // Decrease NumOfIcies
         this.icies.splice(0, this.icies.length);
 
         // Remove all the shapes
@@ -372,12 +517,11 @@ console.log("SCRIPT: Loaded Icy JS");
 
     // Get the total number of icy elements present in the window
     getTotalIcies: function () {
-      return _TotalNumOfIcies
-    }
+      return _TotalNumOfIcies;
+    },
   };
 
   // After setup:
-	// Add the IcyGenerator to the window object if it doesn't already exist.
-  global.IcyGenerator = global.IcyGenerator || IcyGenerator
-  
+  // Add the IcyGenerator to the window object if it doesn't already exist.
+  global.IcyGenerator = global.IcyGenerator || IcyGenerator;
 })(window, window.document, $);
