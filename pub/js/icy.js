@@ -11,23 +11,24 @@ console.log("SCRIPT: Loaded Icy JS");
 
   function IcyGenerator(slide, collide) {
     // Here should contain all the variables that each Icy elements should have a unique instance of
-    // POTENTIALLY IN THE FUTURE, Icy elements from the same instance could be stored in an array to allow elements from that array to collide with each other
+    // Icy elements from the same instance could be stored in an array to allow elements from that array to collide with each other
     this.icies = [];
     // indicates whether sliding and collision is enabled for Icy Elements generated from this function. Will probably move this property to be associated with individual Icy elements in the future
     this.slide = slide && slide == "slide" ? true : false;
     this.collide = collide && collide == "collide" ? true : false;
     this.randomTimerVel = []; // stores the [timer, xVelocity, yVelocity] for each icy element
+    this.shapes = []; // stores the shape for each corresponding icy element
     this.randomEnabled = false;
   }
 
   /*=======Private properties and functions==========*/
 	// unless we attach these to the global window object, they cannot be accessed directly.
 	// they will only be in the closure of this function, and can be accessed only the places we use them (such as in the functions of the IcyGenerator prototype)
-  let iW, iH, iX, iY, tW, tH, tX, tY; // Attributes for icy movement on window
-  let _NumOfIcies = 0 // Number of Icy elements currently present in this IcyGenerator
+  let _iW, _iH, _iX, _iY, _tW, _tH, _tX, _tY, _icX, _icY, _tcX, _tcY, _iRad, _tRad; // Attributes for icy movement on window
+  let _TotalNumOfIcies = 0 // Number of Total Icy elements currently present in the window
   
   function _changeNumOfIcies(change) {
-    _NumOfIcies = _NumOfIcies + change;
+    _TotalNumOfIcies = _TotalNumOfIcies + change;
   }
   /*=======End of private properties/functions=======*/
 
@@ -62,6 +63,8 @@ console.log("SCRIPT: Loaded Icy JS");
         icy.style.borderBottom = `${
           startPos ? parseInt(startPos[2]) + parseInt(startPos[3]) : 50
         }px solid gray`;
+      } else {  // Default
+        icy.style.backgroundColor= "Gray";
       }
 
       // Mouse functions
@@ -83,33 +86,57 @@ console.log("SCRIPT: Loaded Icy JS");
         // Collision Detection Function
         const collisionDetection = () => {
           for (let i = 0; i < this.icies.length; i++) {
-            iW = icy.offsetWidth;
-            iH = icy.offsetHeight;
-            iX = icy.offsetLeft;
-            iY = icy.offsetTop;
-            tW = this.icies[i].offsetWidth;
-            tH = this.icies[i].offsetHeight;
-            tX = this.icies[i].offsetLeft;
-            tY = this.icies[i].offsetTop;
+            _iW = icy.offsetWidth;
+            _iH = icy.offsetHeight;
+            _iX = icy.offsetLeft;
+            _iY = icy.offsetTop;
+            _tW = this.icies[i].offsetWidth;
+            _tH = this.icies[i].offsetHeight;
+            _tX = this.icies[i].offsetLeft;
+            _tY = this.icies[i].offsetTop;
+
+            _icX = _iX + _iW / 2 // Center X of initial icy
+            _icY = _iY + _iH / 2 // Center Y of initial icy
+            _tcX = _tX + _tW / 2 // Center X of target icy
+            _tcY = _tY + _tH / 2 // Center Y of target icy
+
+            _iRad = Math.min((_iW / 2),(_iH / 2)) // Radius of initial icy based on min or height or width
+            _tRad = Math.min((_tW / 2),(_tH / 2)) // Radius of target icy based on min or height or width
 
             //log(iW + ' ' + iH + ' ' + iX + ' ' + iY)
 
             // Rudimentary Detection Math
-            // TODO: expand upon this!!!!!!!!!!!!!!!
-            if (
-              iX + iW > tX &&
-              iX < tX + tW &&
-              iY + iH > tY &&
-              iY < tY + tH &&
-              this.icies.indexOf(icy) != i
-            ) {
-              log("Collision Detected");
-              this.icies[i].style.left = `${
-                this.icies[i].offsetLeft - changeX
-              }px`;
-              this.icies[i].style.top = `${
-                this.icies[i].offsetTop - changeY
-              }px`;
+            // For circles: check if sum of their radii is less than or equal to the distance between the center of the two circles
+            // For rectangle: simple check
+            if (this.shapes[i] == "circle" && this.shapes[this.icies.indexOf(icy)] == "circle") { // Circle vs Circle
+              if (
+                Math.sqrt(Math.pow(_tcX-_icX, 2) + Math.pow(_tcY-_icY, 2)) <= (_iRad + _tRad) &&
+                this.icies.indexOf(icy) != i
+              ) {
+                log("Collision Detected. Circle vs Circle.");
+                this.icies[i].style.left = `${
+                  this.icies[i].offsetLeft - changeX
+                }px`;
+                this.icies[i].style.top = `${
+                  this.icies[i].offsetTop - changeY
+                }px`;
+              }
+            } else {  // Default: Rectangle vs Rectangle
+              if (
+                _iX + _iW > _tX &&
+                _iX < _tX + _tW &&
+                _iY + _iH > _tY &&
+                _iY < _tY + _tH &&
+                this.icies.indexOf(icy) != i
+              ) {
+                log("Collision Detected");
+                this.icies[i].style.left = `${
+                  this.icies[i].offsetLeft - changeX
+                }px`;
+                this.icies[i].style.top = `${
+                  this.icies[i].offsetTop - changeY
+                }px`;
+              }
             }
           }
 
@@ -197,6 +224,13 @@ console.log("SCRIPT: Loaded Icy JS");
       body.append(icy);
 
       this.icies.push(icy); // add to the icies list
+
+      // add the shape to the shapes list
+      if (shape) {  // if shape parameter was given at the beginning
+       this.shapes.push(shape)
+      } else {  // Default Shape: rectangle
+        this.shapes.push('rectangle')
+      }
       _changeNumOfIcies(1); // Increase NumOfIcies by 1
       return icy;
     },
@@ -214,7 +248,8 @@ console.log("SCRIPT: Loaded Icy JS");
           this.randomTimerVel.splice(this.icies.indexOf(icy), 1);
         }
 
-        // The remove the Icy element
+        // Then remove the Icy element and its corresponding shape
+        this.shapes.splice(this.icies.indexOf(icy), 1);
         this.icies.splice(this.icies.indexOf(icy), 1);
         $(icy).remove();
         _changeNumOfIcies(-1) // Decrease NumOfIcies by 1
@@ -238,6 +273,9 @@ console.log("SCRIPT: Loaded Icy JS");
         // Remove all the icies
         _changeNumOfIcies(-1*this.icies.length);  // Decrease NumOfIcies
         this.icies.splice(0, this.icies.length);
+
+        // Remove all the shapes
+        this.shapes.splice(0, this.shapes.length);
       }
     },
 
@@ -332,9 +370,9 @@ console.log("SCRIPT: Loaded Icy JS");
       return this.collide;
     },
 
-    // Get the number of icy elements present in this IcyGenerator
+    // Get the total number of icy elements present in the window
     getTotalIcies: function () {
-      return _NumOfIcies
+      return _TotalNumOfIcies
     }
   };
 
