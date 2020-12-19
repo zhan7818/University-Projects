@@ -13,7 +13,7 @@ log('SCRIPT: Loaded Examples JS')
 // icyGen.removeIcy(what)
 const body = $('body')
 
-const icyGen = new IcyGenerator("slide","collide");
+const icyGen = new IcyGenerator("slide","collide","soundEnabled");
 
 const invasiveAds = document.querySelector('#InvasiveAds');
 
@@ -30,9 +30,9 @@ function deployInvasiveAds(e) {
         // hint.appendChild(document.createTextNode('To get rid of these ads, simply drag them out of the bounds of the viewport'))
         // body.append(hint)
         
-        const circ = icyGen.makeIcy("circle", ["100","50","250","250"]);
-        const tri = icyGen.makeIcy("triangle", ["800","50","50","50"])
-        const rect = icyGen.makeIcy("rectangle", ["400","485","300","300"]);
+        const circ = icyGen.makeIcy("circle", ["100","50","250","250"],'./js/hardcoded/click.mp3','./js/hardcoded/slide.mp3');
+        const oval = icyGen.makeIcy("oval", ["800","50","50","50"],'./js/hardcoded/click.mp3','./js/hardcoded/slide.mp3')
+        const rect = icyGen.makeIcy("rectangle", ["400","485","300","300"],'./js/hardcoded/click.mp3','./js/hardcoded/slide.mp3');
 
         circ.style.backgroundImage="url(./js/hardcoded/ad_one.jpg)"
         rect.style.backgroundImage="url(./js/hardcoded/ad_two.jpg)"

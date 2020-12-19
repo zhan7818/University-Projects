@@ -8,7 +8,7 @@ console.log("SCRIPT: Loaded Icy JS");
 // Create an object constructor and add to its prototype
 
 (function (global, document, $) {
-  function IcyGenerator(slide, collide) {
+  function IcyGenerator(slide, collide, sound) {
     // Here should contain all the variables that each Icy elements should have a unique instance of
     // Icy elements from the same instance could be stored in an array to allow elements from that array to collide with each other
     this.icies = [];
@@ -16,8 +16,11 @@ console.log("SCRIPT: Loaded Icy JS");
     this.slide = slide && slide == "slide" ? true : false;
     this.collide = collide && collide == "collide" ? true : false;
     this.randomTimerVel = []; // stores the [timer, xVelocity, yVelocity] for each icy element
-    this.shapes = []; // stores the shape for each corresponding icy element
+    this.shapes = []; // stores the string representation of each shape for each corresponding icy element (eg. 'circle', 'rectangle')
     this.randomEnabled = false;
+    this.soundEffectClick = new Audio(); // The variable for the sound effect to play when clicked
+    this.soundEffectSlide = new Audio(); // The variable for the sound effect to play when sliding
+    this.soundEnabled = sound && sound == "soundEnabled" ? true : false; // Indicates whether sound effects are enabled
   }
 
   /*=======Private properties and functions==========*/
@@ -52,7 +55,11 @@ console.log("SCRIPT: Loaded Icy JS");
   // Here we will implement all the functionalities for IcyGenerator
   IcyGenerator.prototype = {
     // Creates and returns a div that represents the icy element
-    makeIcy: function (shape, startPos) {
+    // shape: shape of the icy element, either circle or rectangle
+    // startPos: starting position of the icy element on the window
+    // clickURL: url for the sound effect when clicked
+    // slideURL: url for the sound effect when sliding
+    makeIcy: function (shape, startPos, clickURL, slideURL) {
       const icy = document.createElement("div");
       // The shape of the Icy element depends on the shape parameter
       // Currently only Circle and Rectangles are supported
@@ -68,21 +75,19 @@ console.log("SCRIPT: Loaded Icy JS");
       } else if (shape && shape == "rectangle") {
         icy.style.borderRadius = "0";
         icy.style.backgroundColor = "Gray";
-      } else if (shape && shape == "triangle") {
-        icy.style.width = "0px";
-        icy.style.height = "0px";
-        icy.style.borderLeft = `${
-          startPos ? startPos[2] : 25
-        }px solid transparent`;
-        icy.style.borderRight = `${
-          startPos ? startPos[3] : 25
-        }px solid transparent`;
-        icy.style.borderBottom = `${
-          startPos ? parseInt(startPos[2]) + parseInt(startPos[3]) : 50
-        }px solid gray`;
       } else {
         // Default
         icy.style.backgroundColor = "Gray";
+      }
+
+      // Check if clickURL is provided
+      if (clickURL) {
+        this.soundEffectClick.src = clickURL;
+      }
+
+      // Check if slideURL is provided
+      if (slideURL) {
+        this.soundEffectSlide.src = slideURL;
       }
 
       // Mouse functions
@@ -93,6 +98,12 @@ console.log("SCRIPT: Loaded Icy JS");
 
         // Pause all the random movements
         this.setRandomMovement(false);
+
+        // If soundEnabled is true, play the sound effect
+        if (this.soundEnabled && this.soundEffectClick.src != "") {
+          log("playing sound effect for clicking");
+          this.soundEffectClick.play();
+        }
 
         // Variables for position of the cursor; remember e is an instance of MouseEvent
         let cursorX = e.clientX;
@@ -318,6 +329,12 @@ console.log("SCRIPT: Loaded Icy JS");
           const bounds = icy.getBoundingClientRect(); // NOTE THAT THIS TAKES INTO CONSIDERATION OF MARGIN AND PADDING AND IS DIFFERENT FROM STYLE.___
           if (this.slide) {
             log("sliding");
+
+            if (this.soundEnabled && this.soundEffectSlide.src != "") {
+              log("playing sliding sound effect");
+              this.soundEffectSlide.play();
+            }
+
             for (let i = 1; i <= 50; i++) {
               // Possibly make 50 a slideDistance variable?
               setTimeout(() => {
@@ -500,6 +517,21 @@ console.log("SCRIPT: Loaded Icy JS");
       this.collide = collide;
     },
 
+    // Set soundEnabled attribute
+    setSoundEnabled: function (soundEnabled) {
+      this.soundEnabled = soundEnabled;
+    },
+
+    // Set the src url for soundEffectClick
+    setSoundEffectClick: function (soundURL) {
+      this.soundEffectClick.src = soundURL;
+    },
+
+    // Set the src url for soundEffectSlide
+    setSoundEffectSlide: function (soundURL) {
+      this.soundEffectSlide.src = soundURL;
+    },
+
     // Get randomEnabled attribute
     getRandomEnabled: function () {
       return this.randomEnabled;
@@ -513,6 +545,11 @@ console.log("SCRIPT: Loaded Icy JS");
     // Get slide attribute
     getCollide: function () {
       return this.collide;
+    },
+
+    // Get soundEnabled attribute
+    getSoundEnabled: function () {
+      return this.soundEnabled;
     },
 
     // Get the total number of icy elements present in the window
