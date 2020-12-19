@@ -408,7 +408,7 @@ console.log("SCRIPT: Loaded Icy JS");
           ) {
             log("removing icy element");
             this.icies.splice(this.icies.indexOf(icy), 1);
-            $(icy).remove();
+            $(icy).remove(); // $ function courtesy of jquery version 3.5.1
           }
         };
 
@@ -422,7 +422,7 @@ console.log("SCRIPT: Loaded Icy JS");
       // Three events must be taken care of: mouseover, mouseup, mousedown
       icy.addEventListener("mousedown", mousedown);
 
-      const body = $("body"); // jQuery equivalent to: const body = document.querySelector('body')
+      const body = $("body"); // $ function courtesy of jquery version 3.5.1. jQuery equivalent to: const body = document.querySelector('body')
       body.append(icy);
 
       this.icies.push(icy); // add to the icies list
@@ -464,7 +464,7 @@ console.log("SCRIPT: Loaded Icy JS");
         this.shapes.splice(this.icies.indexOf(icy), 1);
         this.redirectURL.splice(this.icies.indexOf(icy), 1);
         this.icies.splice(this.icies.indexOf(icy), 1);
-        $(icy).remove();
+        $(icy).remove(); // $ function courtesy of jquery version 3.5.1
         _changeNumOfIcies(-1); // Decrease NumOfIcies by 1
       } else if (!icy) {
         log("removing all icy elements");
@@ -474,7 +474,7 @@ console.log("SCRIPT: Loaded Icy JS");
           if (this.randomTimerVel.length === this.icies.length) {
             window.clearInterval(this.randomTimerVel[i][0]);
           }
-          $(this.icies[i].remove());
+          $(this.icies[i].remove());  // $ function courtesy of jquery version 3.5.1
         }
 
         // Remove the entire randomTimerVel array
