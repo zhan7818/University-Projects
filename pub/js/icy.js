@@ -17,7 +17,7 @@ console.log("SCRIPT: Loaded Icy JS");
     this.collide = collide && collide == "collide" ? true : false;
     this.randomTimerVel = []; // stores the [timer, xVelocity, yVelocity] for each icy element
     this.shapes = []; // stores the string representation of each shape for each corresponding icy element (eg. 'circle', 'rectangle'). Defaults to rectangle
-    this.clickRedirectURL = [] // A list that stores the URLs to take the user to when they click the corresponding Icy element. Defaults to current webpage
+    this.clickRedirectURL = []; // A list that stores the URLs to take the user to when they click the corresponding Icy element. Defaults to current webpage
     this.randomEnabled = false;
     this.soundEffectClick = new Audio(); // The variable for the sound effect to play when clicked
     this.soundEffectSlide = new Audio(); // The variable for the sound effect to play when sliding
@@ -112,8 +112,8 @@ console.log("SCRIPT: Loaded Icy JS");
         }
 
         // Record original X and Y position
-        _originX = e.clientX
-        _originY = e.clientY
+        _originX = e.clientX;
+        _originY = e.clientY;
 
         // Variables for position of the cursor; remember e is an instance of MouseEvent
         _cursorX = e.clientX;
@@ -346,18 +346,26 @@ console.log("SCRIPT: Loaded Icy JS");
               this.soundEffectSlide.play();
             }
 
-            for (let i = 1; i <= (50 * this.slideTimeCoef); i++) {
+            for (let i = 1; i <= 50 * this.slideTimeCoef; i++) {
               setTimeout(() => {
-                if (i <= (Math.floor((50 * this.slideTimeCoef)*2/5))) {
-                  icy.style.left = `${bounds.left - _changeX * i * 0.3 * this.slideSpeedCoef}px`;
-                  icy.style.top = `${bounds.top - _changeY * i * 0.3 * this.slideSpeedCoef}px`;
+                if (i <= Math.floor((50 * this.slideTimeCoef * 2) / 5)) {
+                  icy.style.left = `${
+                    bounds.left - _changeX * i * 0.3 * this.slideSpeedCoef
+                  }px`;
+                  icy.style.top = `${
+                    bounds.top - _changeY * i * 0.3 * this.slideSpeedCoef
+                  }px`;
                 } else {
                   // Sliding slows down
                   icy.style.left = `${
-                    bounds.left - _changeX * 20 * 0.3 - _changeX * (i - 20) * 0.1 * this.slideSpeedCoef
+                    bounds.left -
+                    _changeX * 20 * 0.3 -
+                    _changeX * (i - 20) * 0.1 * this.slideSpeedCoef
                   }px`;
                   icy.style.top = `${
-                    bounds.top - _changeY * 20 * 0.3 - _changeY * (i - 20) * 0.1 * this.slideSpeedCoef
+                    bounds.top -
+                    _changeY * 20 * 0.3 -
+                    _changeY * (i - 20) * 0.1 * this.slideSpeedCoef
                   }px`;
                 }
                 // Collision check
@@ -370,8 +378,10 @@ console.log("SCRIPT: Loaded Icy JS");
 
           // Check if the user simply clicked the Icy element, or dragged it
           if (_originX == _cursorX && _originY == _cursorY) {
-            log("Clicked instead of Dragged. Direct to corresponding URL")
-            window.location.replace(this.clickRedirectURL[this.icies.indexOf(icy)])
+            log("Clicked instead of Dragged. Direct to corresponding URL");
+            window.location.replace(
+              this.clickRedirectURL[this.icies.indexOf(icy)]
+            );
           }
 
           window.removeEventListener("mousemove", mousemove);
@@ -393,7 +403,6 @@ console.log("SCRIPT: Loaded Icy JS");
         // Adding EventListener on the window since we can't assume the mouse is always in the view window.
         window.addEventListener("mousemove", mousemove);
         window.addEventListener("mouseup", mouseup);
-
       };
 
       // Three events must be taken care of: mouseover, mouseup, mousedown
@@ -415,9 +424,10 @@ console.log("SCRIPT: Loaded Icy JS");
 
       // add redirectURL to the clickRedirectURL list
       if (redirectURL) {
-        this.clickRedirectURL.push(redirectURL)
-      } else {  // Default to current browser page
-        this.clickRedirectURL.push(window.location.href)
+        this.clickRedirectURL.push(redirectURL);
+      } else {
+        // Default to current browser page
+        this.clickRedirectURL.push(window.location.href);
       }
       _changeNumOfIcies(1); // Increase NumOfIcies by 1
       return icy;
@@ -463,7 +473,7 @@ console.log("SCRIPT: Loaded Icy JS");
 
         // Remove all the redirectURLs
         this.clickRedirectURL.splice(0, this.clickRedirectURL.length);
-        
+
         // Remove all the icies
         _changeNumOfIcies(-1 * this.icies.length); // Decrease NumOfIcies
         this.icies.splice(0, this.icies.length);
@@ -553,12 +563,12 @@ console.log("SCRIPT: Loaded Icy JS");
 
     // Set the value for slideSpeedCoef
     setSlideSpeedCoef: function (speed) {
-      this.slideSpeedCoef = speed
+      this.slideSpeedCoef = speed;
     },
 
     // Set the value for slideTimeCoef
     setSlideTimeCoef: function (time) {
-      this.slideTimeCoef = time
+      this.slideTimeCoef = time;
     },
 
     // Get randomEnabled attribute
