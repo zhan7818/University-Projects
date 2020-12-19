@@ -47,6 +47,7 @@ console.log("SCRIPT: Loaded Icy JS");
   let _TotalNumOfIcies = 0; // Number of Total Icy elements currently present in the window
   let _cursorX, _cursorY, _changeX, _changeY; // Variables used for moving Icy elements
   let _originX, _originY; // Variables used for checking if the user clicked or dragged an Icy element
+  let _slideInProgress = false; // Variable used to check if a sliding motion is in progress; helps prevent conflicts in movement command
 
   function _changeNumOfIcies(change) {
     _TotalNumOfIcies = _TotalNumOfIcies + change;
@@ -346,6 +347,8 @@ console.log("SCRIPT: Loaded Icy JS");
               this.soundEffectSlide.play();
             }
 
+            _slideInProgress = true;
+            icy.removeEventListener("mousedown", mousedown);
             for (let i = 1; i <= 50 * this.slideTimeCoef; i++) {
               setTimeout(() => {
                 if (i <= Math.floor((50 * this.slideTimeCoef * 2) / 5)) {
@@ -371,6 +374,11 @@ console.log("SCRIPT: Loaded Icy JS");
                 // Collision check
                 if (this.collide) {
                   collisionDetection();
+                }
+
+                if (i == 50 * this.slideTimeCoef) {
+                  _slideInProgress = false;
+                  icy.addEventListener("mousedown", mousedown);
                 }
               }, 15 * i);
             }
@@ -401,8 +409,10 @@ console.log("SCRIPT: Loaded Icy JS");
         };
 
         // Adding EventListener on the window since we can't assume the mouse is always in the view window.
+        // if (!_slideInProgress) {
         window.addEventListener("mousemove", mousemove);
         window.addEventListener("mouseup", mouseup);
+        // }
       };
 
       // Three events must be taken care of: mouseover, mouseup, mousedown
