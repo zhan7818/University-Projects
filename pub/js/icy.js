@@ -16,7 +16,8 @@ console.log("SCRIPT: Loaded Icy JS");
     this.slide = slide && slide == "slide" ? true : false;
     this.collide = collide && collide == "collide" ? true : false;
     this.randomTimerVel = []; // stores the [timer, xVelocity, yVelocity] for each icy element
-    this.shapes = []; // stores the string representation of each shape for each corresponding icy element (eg. 'circle', 'rectangle')
+    this.shapes = []; // stores the string representation of each shape for each corresponding icy element (eg. 'circle', 'rectangle'). Defaults to rectangle
+    this.clickRedirectURL = [] // A list that stores the URLs to take the user to when they click the corresponding Icy element. Defaults to current webpage
     this.randomEnabled = false;
     this.soundEffectClick = new Audio(); // The variable for the sound effect to play when clicked
     this.soundEffectSlide = new Audio(); // The variable for the sound effect to play when sliding
@@ -42,8 +43,10 @@ console.log("SCRIPT: Loaded Icy JS");
     _tcY,
     _iRad,
     _tRad,
-    _collided; // Attributes for icy movement on window
+    _collided; // Attributes for icy movement on window; used for collisionDetection()
   let _TotalNumOfIcies = 0; // Number of Total Icy elements currently present in the window
+  let _cursorX, _cursorY, _changeX, _changeY; // Variables used for moving Icy elements
+  let _originX, _originY; // Variables used for checking if the user clicked or dragged an Icy element
 
   function _changeNumOfIcies(change) {
     _TotalNumOfIcies = _TotalNumOfIcies + change;
@@ -61,7 +64,8 @@ console.log("SCRIPT: Loaded Icy JS");
     // startPos: starting position of the icy element on the window
     // clickURL: url for the sound effect when clicked
     // slideURL: url for the sound effect when sliding
-    makeIcy: function (shape, startPos, clickURL, slideURL) {
+    // redirectURL: url for the webpage to redirect the user to when they click the Icy element
+    makeIcy: function (shape, startPos, clickURL, slideURL, redirectURL) {
       const icy = document.createElement("div");
       // The shape of the Icy element depends on the shape parameter
       // Currently only Circle and Rectangles are supported
@@ -107,12 +111,16 @@ console.log("SCRIPT: Loaded Icy JS");
           this.soundEffectClick.play();
         }
 
-        // Variables for position of the cursor; remember e is an instance of MouseEvent
-        let cursorX = e.clientX;
-        let cursorY = e.clientY;
+        // Record original X and Y position
+        _originX = e.clientX
+        _originY = e.clientY
 
-        let changeX = 0;
-        let changeY = 0;
+        // Variables for position of the cursor; remember e is an instance of MouseEvent
+        _cursorX = e.clientX;
+        _cursorY = e.clientY;
+
+        _changeX = 0;
+        _changeY = 0;
 
         // Collision Detection Function
         const collisionDetection = () => {
@@ -290,10 +298,10 @@ console.log("SCRIPT: Loaded Icy JS");
             // Finally, do the collision movement IF _collided is true
             if (_collided) {
               this.icies[i].style.left = `${
-                this.icies[i].offsetLeft - changeX
+                this.icies[i].offsetLeft - _changeX
               }px`;
               this.icies[i].style.top = `${
-                this.icies[i].offsetTop - changeY
+                this.icies[i].offsetTop - _changeY
               }px`;
             }
           }
@@ -307,18 +315,18 @@ console.log("SCRIPT: Loaded Icy JS");
           e = e || window.event;
           e.preventDefault();
 
-          changeX = cursorX - e.clientX;
-          changeY = cursorY - e.clientY;
+          _changeX = _cursorX - e.clientX;
+          _changeY = _cursorY - e.clientY;
 
           // Get the bounds of the element (the function returns the smallest rectangle which contains the entire element)
           const bounds = icy.getBoundingClientRect();
 
-          icy.style.left = `${bounds.left - changeX}px`;
-          icy.style.top = `${bounds.top - changeY}px`;
+          icy.style.left = `${bounds.left - _changeX}px`;
+          icy.style.top = `${bounds.top - _changeY}px`;
 
           // Update cursor positions
-          cursorX = e.clientX;
-          cursorY = e.clientY;
+          _cursorX = e.clientX;
+          _cursorY = e.clientY;
 
           // Collision check
           if (this.collide) {
@@ -341,15 +349,15 @@ console.log("SCRIPT: Loaded Icy JS");
             for (let i = 1; i <= (50 * this.slideTimeCoef); i++) {
               setTimeout(() => {
                 if (i <= (Math.floor((50 * this.slideTimeCoef)*2/5))) {
-                  icy.style.left = `${bounds.left - changeX * i * 0.3 * this.slideSpeedCoef}px`;
-                  icy.style.top = `${bounds.top - changeY * i * 0.3 * this.slideSpeedCoef}px`;
+                  icy.style.left = `${bounds.left - _changeX * i * 0.3 * this.slideSpeedCoef}px`;
+                  icy.style.top = `${bounds.top - _changeY * i * 0.3 * this.slideSpeedCoef}px`;
                 } else {
                   // Sliding slows down
                   icy.style.left = `${
-                    bounds.left - changeX * 20 * 0.3 - changeX * (i - 20) * 0.1 * this.slideSpeedCoef
+                    bounds.left - _changeX * 20 * 0.3 - _changeX * (i - 20) * 0.1 * this.slideSpeedCoef
                   }px`;
                   icy.style.top = `${
-                    bounds.top - changeY * 20 * 0.3 - changeY * (i - 20) * 0.1 * this.slideSpeedCoef
+                    bounds.top - _changeY * 20 * 0.3 - _changeY * (i - 20) * 0.1 * this.slideSpeedCoef
                   }px`;
                 }
                 // Collision check
@@ -359,6 +367,13 @@ console.log("SCRIPT: Loaded Icy JS");
               }, 15 * i);
             }
           }
+
+          // Check if the user simply clicked the Icy element, or dragged it
+          if (_originX == _cursorX && _originY == _cursorY) {
+            log("Clicked instead of Dragged. Direct to corresponding URL")
+            window.location.replace(this.clickRedirectURL[this.icies.indexOf(icy)])
+          }
+
           window.removeEventListener("mousemove", mousemove);
           window.removeEventListener("mouseup", mouseup);
 
@@ -397,6 +412,13 @@ console.log("SCRIPT: Loaded Icy JS");
         // Default Shape: rectangle
         this.shapes.push("rectangle");
       }
+
+      // add redirectURL to the clickRedirectURL list
+      if (redirectURL) {
+        this.clickRedirectURL.push(redirectURL)
+      } else {  // Default to current browser page
+        this.clickRedirectURL.push(window.location.href)
+      }
       _changeNumOfIcies(1); // Increase NumOfIcies by 1
       return icy;
     },
@@ -414,8 +436,9 @@ console.log("SCRIPT: Loaded Icy JS");
           this.randomTimerVel.splice(this.icies.indexOf(icy), 1);
         }
 
-        // Then remove the Icy element and its corresponding shape
+        // Then remove the Icy element and its corresponding shape and redirectURL
         this.shapes.splice(this.icies.indexOf(icy), 1);
+        this.redirectURL.splice(this.icies.indexOf(icy), 1);
         this.icies.splice(this.icies.indexOf(icy), 1);
         $(icy).remove();
         _changeNumOfIcies(-1); // Decrease NumOfIcies by 1
@@ -435,12 +458,15 @@ console.log("SCRIPT: Loaded Icy JS");
           this.randomTimerVel.splice(0, this.randomTimerVel.length);
         }
 
+        // Remove all the shapes
+        this.shapes.splice(0, this.shapes.length);
+
+        // Remove all the redirectURLs
+        this.clickRedirectURL.splice(0, this.clickRedirectURL.length);
+        
         // Remove all the icies
         _changeNumOfIcies(-1 * this.icies.length); // Decrease NumOfIcies
         this.icies.splice(0, this.icies.length);
-
-        // Remove all the shapes
-        this.shapes.splice(0, this.shapes.length);
       }
     },
 
@@ -453,16 +479,6 @@ console.log("SCRIPT: Loaded Icy JS");
       let xVel, yYel;
       if (this.randomEnabled) {
         for (let i = 0; i < this.icies.length; i++) {
-          // Check if element is stuck on the edges
-          // if (this.icies[i].offsetLeft < 0 || this.icies[i].offsetLeft + this.icies[i].offsetWidth > window.innerWidth ||
-          //   this.icies[i].offsetTop < 0 || this.icies[i].offsetTop + this.icies[i].offsetHeight > window.innerHeight) {
-          //     if (this.randomTimerVel.length === this.icies.length) {
-          //       window.clearInterval(this.randomTimerVel[i][0])
-          //       this.randomTimerVel.splice(i,1)
-          //     }
-          //     $(this.icices[i]).remove();
-          //     this.icies.splice(i,1)
-          // }
           xVel = Math.floor(Math.random() * 3 + 1);
           yYel = Math.floor(Math.random() * 3 + 1);
           this.randomTimerVel.push([
