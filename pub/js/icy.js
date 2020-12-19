@@ -321,7 +321,7 @@ console.log("SCRIPT: Loaded Icy JS");
 
           // Get the bounds of the element (the function returns the smallest rectangle which contains the entire element)
           const bounds = icy.getBoundingClientRect();
-
+          
           icy.style.left = `${bounds.left - _changeX}px`;
           icy.style.top = `${bounds.top - _changeY}px`;
 
