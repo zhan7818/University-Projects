@@ -1,0 +1,19 @@
+/* CSS Styles for index.js*/
+
+/* Main page styles below */
+
+#canvas-wrapper {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-color: lightblue;
+}
+
+#titleImageContainer {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 100px;
+    width: 50%;
+}

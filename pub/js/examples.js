@@ -5,12 +5,6 @@ const log = console.log
 log('----------')
 log('SCRIPT: Loaded Examples JS')
 
-// setTimeout(() => {
-//     log("stop")
-//     icyGen.setRandomMovement(false)
-// }, 3000)
-// log(what)
-// icyGen.removeIcy(what)
 const body = $('body')
 
 const icyGen = new IcyGenerator("slide","collide","soundEnabled");

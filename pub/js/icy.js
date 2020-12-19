@@ -17,7 +17,7 @@ console.log("SCRIPT: Loaded Icy JS");
     this.collide = collide && collide == "collide" ? true : false;
     this.randomTimerVel = []; // stores the [timer, xVelocity, yVelocity] for each icy element
     this.shapes = []; // stores the string representation of each shape for each corresponding icy element (eg. 'circle', 'rectangle'). Defaults to rectangle
-    this.clickRedirectURL = []; // A list that stores the URLs to take the user to when they click the corresponding Icy element. Defaults to current webpage
+    this.clickRedirectURL = []; // A list that stores the URLs to take the user to when they click the corresponding Icy element. Defaults to "null", which means no click actions
     this.randomEnabled = false;
     this.soundEffectClick = new Audio(); // The variable for the sound effect to play when clicked
     this.soundEffectSlide = new Audio(); // The variable for the sound effect to play when sliding
@@ -320,10 +320,12 @@ console.log("SCRIPT: Loaded Icy JS");
           _changeY = _cursorY - e.clientY;
 
           // Get the bounds of the element (the function returns the smallest rectangle which contains the entire element)
-          const bounds = icy.getBoundingClientRect();
-          
-          icy.style.left = `${bounds.left - _changeX}px`;
-          icy.style.top = `${bounds.top - _changeY}px`;
+          // const bounds = icy.getBoundingClientRect();
+
+          // icy.style.left = `${bounds.left - _changeX}px`;
+          // icy.style.top = `${bounds.top - _changeY}px`;
+          icy.style.left = `${icy.offsetLeft - _changeX}px`;
+          icy.style.top = `${icy.offsetTop - _changeY}px`;
 
           // Update cursor positions
           _cursorX = e.clientX;
@@ -387,9 +389,11 @@ console.log("SCRIPT: Loaded Icy JS");
           // Check if the user simply clicked the Icy element, or dragged it
           if (_originX == _cursorX && _originY == _cursorY) {
             log("Clicked instead of Dragged. Direct to corresponding URL");
-            window.location.replace(
-              this.clickRedirectURL[this.icies.indexOf(icy)]
-            );
+            if (this.clickRedirectURL[this.icies.indexOf(icy)] != "null") {
+              window.location.replace(
+                this.clickRedirectURL[this.icies.indexOf(icy)]
+              );
+            }
           }
 
           window.removeEventListener("mousemove", mousemove);
@@ -437,7 +441,7 @@ console.log("SCRIPT: Loaded Icy JS");
         this.clickRedirectURL.push(redirectURL);
       } else {
         // Default to current browser page
-        this.clickRedirectURL.push(window.location.href);
+        this.clickRedirectURL.push("null");
       }
       _changeNumOfIcies(1); // Increase NumOfIcies by 1
       return icy;
@@ -579,6 +583,16 @@ console.log("SCRIPT: Loaded Icy JS");
     // Set the value for slideTimeCoef
     setSlideTimeCoef: function (time) {
       this.slideTimeCoef = time;
+    },
+
+    // Set the URL for the backgroundImage
+    setBackgroundImage: function (url, icy) {
+      if (this.icies.includes(icy)) {
+        icy.style.backgroundImage=url
+        log("Icy element background image successfully changed")
+      } else {
+        log("Icy element given does not belong to IcyGenerator used to call it!")
+      }
     },
 
     // Get randomEnabled attribute
