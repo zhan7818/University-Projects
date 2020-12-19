@@ -21,6 +21,8 @@ console.log("SCRIPT: Loaded Icy JS");
     this.soundEffectClick = new Audio(); // The variable for the sound effect to play when clicked
     this.soundEffectSlide = new Audio(); // The variable for the sound effect to play when sliding
     this.soundEnabled = sound && sound == "soundEnabled" ? true : false; // Indicates whether sound effects are enabled
+    this.slideSpeedCoef = 1; // Changes how far the icy elements slide
+    this.slideTimeCoef = 1; // Changes how long the icy elements slide
   }
 
   /*=======Private properties and functions==========*/
@@ -157,6 +159,7 @@ console.log("SCRIPT: Loaded Icy JS");
                 _setCollided(true);
               }
             }
+
             // Rectangle vs Circle
             else if (
               this.shapes[this.icies.indexOf(icy)] == "rectangle" &&
@@ -335,19 +338,18 @@ console.log("SCRIPT: Loaded Icy JS");
               this.soundEffectSlide.play();
             }
 
-            for (let i = 1; i <= 50; i++) {
-              // Possibly make 50 a slideDistance variable?
+            for (let i = 1; i <= (50 * this.slideTimeCoef); i++) {
               setTimeout(() => {
-                if (i <= 20) {
-                  icy.style.left = `${bounds.left - changeX * i * 0.3}px`;
-                  icy.style.top = `${bounds.top - changeY * i * 0.3}px`;
+                if (i <= (Math.floor((50 * this.slideTimeCoef)*2/5))) {
+                  icy.style.left = `${bounds.left - changeX * i * 0.3 * this.slideSpeedCoef}px`;
+                  icy.style.top = `${bounds.top - changeY * i * 0.3 * this.slideSpeedCoef}px`;
                 } else {
                   // Sliding slows down
                   icy.style.left = `${
-                    bounds.left - changeX * 20 * 0.3 - changeX * (i - 20) * 0.1
+                    bounds.left - changeX * 20 * 0.3 - changeX * (i - 20) * 0.1 * this.slideSpeedCoef
                   }px`;
                   icy.style.top = `${
-                    bounds.top - changeY * 20 * 0.3 - changeY * (i - 20) * 0.1
+                    bounds.top - changeY * 20 * 0.3 - changeY * (i - 20) * 0.1 * this.slideSpeedCoef
                   }px`;
                 }
                 // Collision check
@@ -376,6 +378,7 @@ console.log("SCRIPT: Loaded Icy JS");
         // Adding EventListener on the window since we can't assume the mouse is always in the view window.
         window.addEventListener("mousemove", mousemove);
         window.addEventListener("mouseup", mouseup);
+
       };
 
       // Three events must be taken care of: mouseover, mouseup, mousedown
@@ -530,6 +533,16 @@ console.log("SCRIPT: Loaded Icy JS");
     // Set the src url for soundEffectSlide
     setSoundEffectSlide: function (soundURL) {
       this.soundEffectSlide.src = soundURL;
+    },
+
+    // Set the value for slideSpeedCoef
+    setSlideSpeedCoef: function (speed) {
+      this.slideSpeedCoef = speed
+    },
+
+    // Set the value for slideTimeCoef
+    setSlideTimeCoef: function (time) {
+      this.slideTimeCoef = time
     },
 
     // Get randomEnabled attribute

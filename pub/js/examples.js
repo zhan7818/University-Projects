@@ -31,7 +31,7 @@ function deployInvasiveAds(e) {
         // body.append(hint)
         
         const circ = icyGen.makeIcy("circle", ["100","50","250","250"],'./js/hardcoded/click.mp3','./js/hardcoded/slide.mp3');
-        const oval = icyGen.makeIcy("oval", ["800","50","50","50"],'./js/hardcoded/click.mp3','./js/hardcoded/slide.mp3')
+        const circ2 = icyGen.makeIcy("circle", ["800","300","100","100"],'./js/hardcoded/click.mp3','./js/hardcoded/slide.mp3')
         const rect = icyGen.makeIcy("rectangle", ["400","485","300","300"],'./js/hardcoded/click.mp3','./js/hardcoded/slide.mp3');
 
         circ.style.backgroundImage="url(./js/hardcoded/ad_one.jpg)"
