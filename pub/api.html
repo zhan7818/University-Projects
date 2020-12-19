@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>JS Libraries Demo</title>
+
+    <!-- Loading CSS -->
+    <link rel="stylesheet" type="text/css" href="css/styles.css" />
+
+    <!-- First we load jquery from a Google CDN. -->
+    <script
+      defer
+      src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+    ></script>
+    <!-- Then we load a script that depends on jQuery -->
+    <script defer type="text/javascript" src="js/icy.js"></script>
+    <!-- Then we load a script that depends on our libraries (and jQuery) -->
+    <script defer type="text/javascript" src="js/api.js"></script>
+  </head>
+  <body id="api-body">
+    <div id="api-main-wrapper">
+      <div id="api-main-header">
+        <a class="api-home-button" href="index.html"></a>
+      </div>
+      <div class="api-main">
+        <h1>Getting Started</h1>
+        <p>
+          To use Icy, first get the latest version of jquery, then load the icy
+          javascript file:
+        </p>
+        <pre>
+          <code>&ltscript defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">&lt/script></code>
+          <code>&ltscript defer type="text/javascript" src="js/icy.js">&lt/script></code>
+        </pre>
+        <p>
+          By default, Icy overwrites the global
+          <code>IcyGenerator</code> variable when loaded.
+        </p>
+        <h1>API Methods</h1>
+        <h1>Constructor</h1>
+        <h3>new IcyGenerator(slide, collide, sound)</h3>
+        <p>
+          Creates an IcyGenerator with <code>slide</code>, <code>collide</code>,
+          and <code>sound</code> parameters each stating whether the
+          corresponding feature will be enabled by default
+        </p>
+        <p>example usage:</p>
+        <pre>
+          <code>
+            const icyGen = new IcyGenerator("slide","collide","soundEnabled");
+          </code>
+        </pre>
+        <h2>IcyGenerator Base Methods</h2>
+        <h3>.makeIcy(shape, startPos, clickURL, soundURL, redirectURL)</h3>
+        <p>
+          This lets the IcyGenerator create a div element with attached
+          mousedown, mouseup, and mousemove eventlisteners, and pushse them all
+          into their respective attribute storage lists for the IcyGenerator
+          that is used to create them
+        </p>
+        <p>
+          shape lets the developer decide whether they want to make a circle or
+          rectangle Icy element. startPos is an array of 4 values, representing
+          the developer inputted icy element's position on the screen like so:
+          [x,y,width,height].
+        </p>
+        <p>
+          clickURL represents the developer inputted url for the clicking sound
+          effect. (Defaults to click.mp3 in hardcode folder).
+        </p>
+        <p>
+          soundURL represents the developer inputted url for the sliding sound
+          effect. (Defaults to slide.mp3 in hardcode folder).
+        </p>
+        <p>
+          redirectURL represents the developer inputted URL they wish to
+          redirect users to when they click the icy element. (Defaults to
+          index.html)
+        </p>
+        <p>example usage:</p>
+        <pre>
+          <code>
+            const title = icyGen.makeIcy("rectangle", ["500","100","900","500"],'./js/hardcoded/click.mp3','./js/hardcoded/slide.mp3', "index.html")
+          </code>
+        </pre>
+        <h3>.removeIcy(icy)</h3>
+        <p>
+          An icy element can be removed by passing it through this function.
+          Should the function be called without an icy element parameter, all
+          icy element from the IcyGenerator used to call this function will be
+          removed.
+        </p>
+        <p>example usage:</p>
+        <pre>
+          <code>
+            icyGen.removeIcy(title)
+          </code>
+        </pre>
+        <h3>.setRandomMovement(random)</h3>
+        <p>
+          All Icy elements from the same icy generator can be toggled to begin
+          randomly moving across the screen. The <code>random</code> variable
+          can be either true or false to either start or end random movements
+          respectively.
+        </p>
+        <p>example usage:</p>
+        <pre>
+          <code>
+            icyGen.setRandomMovement(true)
+          </code>
+        </pre>
+        <h3>.setSlide(slide)</h3>
+        <p>
+          All Icy elements from the same icy generator can be toggled to enable
+          or disable their sliding feature. The <code>slide</code> variable can
+          be either true or false to either enable or disable sliding
+          respectively.
+        </p>
+        <p>example usage:</p>
+        <pre>
+          <code>
+            icyGen.setSliding(true)
+          </code>
+        </pre>
+        <h3>.setCollide(collide)</h3>
+        <p>
+          All Icy elements from the same icy generator can be toggled to enable
+          or disable their collision feature. The <code>collide</code> variable
+          can be either true or false to either enable or disable collision
+          respectively.
+        </p>
+        <p>example usage:</p>
+        <pre>
+          <code>
+            icyGen.setCollide(true)
+          </code>
+        </pre>
+        <h3>.setSoundEnabled(soundEnabled)</h3>
+        <p>
+          All Icy elements from the same icy generator can be toggled to enable
+          or disable their sound effects, if they were given by the developer
+          when constructed. The <code>soundEnabled</code> variable can be either
+          true or false to either enable or disable sound effects respectively.
+        </p>
+        <p>example usage:</p>
+        <pre>
+          <code>
+            icyGen.setSoundEnabled(true)
+          </code>
+        </pre>
+        <h3>.setSlideSpeedCoef(speed)</h3>
+        <p>
+          All Icy elements from the same icy generator can have their sliding
+          speed tuned. The <code>speed</code> variable is an integer coefficient
+          used to multiply sliding speed.
+        </p>
+        <p>example usage:</p>
+        <pre>
+          <code>
+            icyGen.setSlideSpeedCoef(2)
+          </code>
+        </pre>
+        <h3>.setSlideTimeCoef(time)</h3>
+        <p>
+          All Icy elements from the same icy generator can have their sliding
+          duration tuned. The <code>time</code> variable is an integer
+          coefficient used to multiply sliding duration.
+        </p>
+        <p>example usage:</p>
+        <pre>
+          <code>
+            icyGen.setSlideTimeCoef(2)
+          </code>
+        </pre>
+        <h3>.setBackGroundImage(url, icy)</h3>
+        <p>
+          A background image can be added to an icy element through this
+          function. the <code>url</code> variable represents the developer
+          inputted url for the background image. the <code>icy</code> represents
+          the icy element in the IcyGenerator used to call this function to add
+          the background image to.
+        </p>
+        <p>example usage:</p>
+        <pre>
+          <code>
+            icyGen.setBackgroundImage("url(./js/hardcoded/api.jpg)", title)
+          </code>
+        </pre>
+      </div>
+    </div>
+  </body>
+</html>

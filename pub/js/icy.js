@@ -499,7 +499,7 @@ console.log("SCRIPT: Loaded Icy JS");
     //   such random movement is terminated by user inputing
     // This feature lends itself well for egregiously invasive ads on a website
     // No collision detection between ads for current implementation
-    RandomMovement: function () {
+    randomMovement: function () {
       let xVel, yYel;
       if (this.randomEnabled) {
         for (let i = 0; i < this.icies.length; i++) {
@@ -547,7 +547,7 @@ console.log("SCRIPT: Loaded Icy JS");
 
     setRandomMovement: function (random) {
       this.randomEnabled = random;
-      this.RandomMovement();
+      this.randomMovement();
     },
 
     // Set sliding attribute
@@ -588,10 +588,12 @@ console.log("SCRIPT: Loaded Icy JS");
     // Set the URL for the backgroundImage
     setBackgroundImage: function (url, icy) {
       if (this.icies.includes(icy)) {
-        icy.style.backgroundImage=url
-        log("Icy element background image successfully changed")
+        icy.style.backgroundImage = url;
+        log("Icy element background image successfully changed");
       } else {
-        log("Icy element given does not belong to IcyGenerator used to call it!")
+        log(
+          "Icy element given does not belong to IcyGenerator used to call it!"
+        );
       }
     },
 
